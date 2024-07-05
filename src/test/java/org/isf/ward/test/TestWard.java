@@ -27,9 +27,18 @@ import org.isf.utils.exception.OHException;
 import org.isf.ward.model.Ward;
 
 public class TestWard {
-
-	private String code = "Z";
+	// Codes and description for wards
+	private String internalMedicineCode = "IM";
 	private String maternityCode = "M";
+	private String nurseryCode = "N";
+	private String surgeryCode = "S";
+	private String internalMedicineDescription = "INTERNAL MEDICINE";
+	private String maternityDescription = "MATERNITY";
+	private String nurseryDescription = "NURSERY";
+	private String surgeryDescription = "SURGERY";
+
+	// Default data
+	private String code = "Z";
 	private String description = "TestDescription";
 	private String telephone = "TestTelephone";
 	private String fax = "TestFac";
@@ -41,23 +50,24 @@ public class TestWard {
 	private boolean isFemale = true;
 	private boolean isMale = false;
 
-	public Ward setup(boolean usingSet) throws OHException {
-		return setup(usingSet, false);
-	}
-
-	public Ward setup(boolean usingSet, boolean maternity) throws OHException {
+	public Ward setup(TestWardType wardType) throws OHException {
 		Ward ward;
 
-		if (usingSet) {
-			ward = new Ward();
-			_setParameters(ward, maternity);
-		} else {
-			// Create Ward with all parameters 
-			ward = new Ward(code, description, telephone, fax, email, beds, nurs, docs,
-					isPharmacy, isMale, isFemale);
-		}
-		if (maternity) {
-			ward.setCode(maternityCode);
+		switch (wardType) {
+			case INTERNAL_MEDICINE:
+				ward = new Ward(internalMedicineCode, internalMedicineDescription, telephone, fax, email, beds, nurs, docs, isMale, isFemale);
+				break;
+			case MATERNITY:
+				ward = new Ward(maternityCode, maternityDescription, telephone, fax, email, beds, nurs, docs, isMale, isFemale);
+				break;
+			case NURSERY:
+				ward = new Ward(nurseryCode, nurseryDescription, telephone, fax, email, beds, nurs, docs, isMale, isFemale);
+				break;
+			case SURGERY:
+				ward = new Ward(surgeryCode, surgeryDescription, telephone, fax, email, beds, nurs, docs, isMale, isFemale);
+				break;
+			default:
+				throw new OHException("Invalid ward type: " + wardType);
 		}
 		return ward;
 	}
@@ -79,10 +89,21 @@ public class TestWard {
 		ward.setTelephone(telephone);
 	}
 
-	public void check(Ward ward) {
-		assertThat(ward.getCode()).isEqualTo(code);
+	public void check(Ward ward, TestWardType wardType) {
+		if (wardType == TestWardType.INTERNAL_MEDICINE) {
+			assertThat(ward.getCode()).isEqualTo(internalMedicineCode);
+			assertThat(ward.getDescription()).isEqualTo(internalMedicineDescription);
+		} else if (wardType == TestWardType.MATERNITY) {
+			assertThat(ward.getCode()).isEqualTo(maternityCode);
+			assertThat(ward.getDescription()).isEqualTo(maternityDescription);
+		} else if (wardType == TestWardType.NURSERY) {
+			assertThat(ward.getCode()).isEqualTo(nurseryCode);
+			assertThat(ward.getDescription()).isEqualTo(nurseryDescription);
+		} else if (wardType == TestWardType.SURGERY) {
+			assertThat(ward.getCode()).isEqualTo(surgeryCode);
+			assertThat(ward.getDescription()).isEqualTo(surgeryDescription);
+		}
 		assertThat(ward.getBeds()).isEqualTo(beds);
-		assertThat(ward.getDescription()).isEqualTo(description);
 		assertThat(ward.getDocs()).isEqualTo(docs);
 		assertThat(ward.getEmail()).isEqualTo(email);
 		assertThat(ward.getFax()).isEqualTo(fax);

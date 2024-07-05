@@ -30,31 +30,26 @@ public class TestMovementType {
 
 	private String code = "ZZABCD";
 	private String description = "TestDescription";
-	private String type = "+";
+	private String chargeType = "+";
+	private String dischargeType = "-";
 
-	public MovementType setup(boolean usingSet) throws OHException {
+	public MovementType setup(boolean charging) throws OHException {
 		MovementType movementType;
 
-		if (usingSet) {
-			movementType = new MovementType();
-			_setParameters(movementType);
-		} else {
-			// Create MovementType with all parameters 
-			movementType = new MovementType(code, description, type);
-		}
+		movementType = new MovementType(code, description, charging ? chargeType : dischargeType);
 
 		return movementType;
 	}
 
-	public void _setParameters(MovementType movementType) {
+	public void _setParameters(MovementType movementType, boolean charging) {
 		movementType.setCode(code);
 		movementType.setDescription(description);
-		movementType.setType(type);
+		movementType.setType(charging ? chargeType : dischargeType);
 	}
 
-	public void check(MovementType movementType) {
+	public void check(MovementType movementType, boolean charging) {
 		assertThat(movementType.getCode()).isEqualTo(code);
 		assertThat(movementType.getDescription()).isEqualTo(description);
-		assertThat(movementType.getType()).isEqualTo(type);
+		assertThat(movementType.getType()).isEqualTo(charging ? chargeType : dischargeType);
 	}
 }

@@ -38,16 +38,10 @@ public class TestSupplier {
 	private String supNote = "TestNote";
 	private Character supDeleted = 'N';
 
-	public Supplier setup(boolean usingSet) throws OHException {
+	public Supplier setup() throws OHException {
 		Supplier supplier;
 
-		if (usingSet) {
-			supplier = new Supplier();
-			_setParameters(supplier);
-		} else {
-			// Create Supplier with all parameters 
-			supplier = new Supplier(supId, supName, supAddress, supTaxcode, supPhone, supFax, supEmail, supNote, supDeleted);
-		}
+		supplier = new Supplier(supId, supName, supAddress, supTaxcode, supPhone, supFax, supEmail, supNote, supDeleted);
 
 		return supplier;
 	}

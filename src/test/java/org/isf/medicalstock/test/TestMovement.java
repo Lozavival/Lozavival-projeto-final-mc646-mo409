@@ -39,22 +39,10 @@ public class TestMovement {
 	private int quantity = 10;
 	private String refNo = "TestRef";
 
-	public Movement setup(
-			Medical medical,
-			MovementType movementType,
-			Ward ward,
-			Lot lot,
-			Supplier supplier,
-			boolean usingSet) throws OHException {
+	public Movement setup(Medical medical, MovementType movementType, Ward ward, Lot lot, GregorianCalendar date, int quantity, Supplier supplier, String refNo) throws OHException {
 		Movement movement;
 
-		if (usingSet) {
-			movement = new Movement();
-			_setParameters(movement, medical, movementType, ward, lot, supplier);
-		} else {
-			// Create Movement with all parameters 
-			movement = new Movement(medical, movementType, ward, lot, date, quantity, supplier, refNo);
-		}
+		movement = new Movement(medical, movementType, ward, lot, date, quantity, supplier, refNo);
 
 		return movement;
 	}

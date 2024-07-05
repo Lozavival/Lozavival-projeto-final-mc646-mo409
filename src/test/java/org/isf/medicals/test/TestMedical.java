@@ -33,20 +33,18 @@ public class TestMedical {
 	private Integer code = null;
 	private String prod_code = "TP1";
 	private String description = "TestDescription";
-	private double initialqty = 10.10;
+	private double initialqty = 1.00;
 	private Integer pcsperpck = 11;
-	private double inqty = 20.20;
-	private double outqty = 30.30;
+	private double inqty = 0.0;
+	private double outqty = 0.0;
 	private double minqty = 40.40;
 
-	public Medical setup(MedicalType medicalType, boolean usingSet) throws OHException {
+	public Medical setup(MedicalType medicalType, boolean outOfStock) throws OHException {
 		Medical medical;
 
-		if (usingSet) {
-			medical = new Medical();
-			_setParameters(medical, medicalType);
+		if (outOfStock) {
+			medical = new Medical(code, medicalType, prod_code, description, 0.0, pcsperpck, minqty, inqty, outqty);
 		} else {
-			// Create Medical with all parameters 
 			medical = new Medical(code, medicalType, prod_code, description, initialqty, pcsperpck, minqty, inqty, outqty);
 		}
 

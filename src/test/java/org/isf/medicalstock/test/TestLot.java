@@ -38,16 +38,10 @@ public class TestLot {
 	private GregorianCalendar dueDate = new GregorianCalendar(2000, 1, 1);
 	private BigDecimal cost = new BigDecimal(10.10);
 
-	public Lot setup(Medical medical, boolean usingSet) throws OHException {
+	public Lot setup(Medical medical, String code, GregorianCalendar preparationDate, GregorianCalendar dueDate, BigDecimal cost) throws OHException {
 		Lot lot;
 
-		if (usingSet) {
-			lot = new Lot();
-			_setParameters(medical, lot);
-		} else {
-			// Create Lot with all parameters 
-			lot = new Lot(medical, code, preparationDate, dueDate, cost);
-		}
+		lot = new Lot(medical, code, preparationDate, dueDate, cost);
 
 		return lot;
 	}

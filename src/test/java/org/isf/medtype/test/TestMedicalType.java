@@ -31,16 +31,10 @@ public class TestMedicalType {
 	private String code = "Z";
 	private String description = "TestDescription";
 
-	public MedicalType setup(boolean usingSet) throws OHException {
+	public MedicalType setup() throws OHException {
 		MedicalType medicalType;
 
-		if (usingSet) {
-			medicalType = new MedicalType();
-			_setParameters(medicalType);
-		} else {
-			// Create MedicalType with all parameters 
-			medicalType = new MedicalType(code, description);
-		}
+		medicalType = new MedicalType(code, description);
 
 		return medicalType;
 	}
