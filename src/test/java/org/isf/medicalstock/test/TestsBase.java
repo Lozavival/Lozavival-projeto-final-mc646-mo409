@@ -53,10 +53,10 @@ import org.isf.ward.service.WardIoOperationRepository;
 import org.isf.ward.test.TestWard;
 import org.isf.ward.test.TestWardType;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
@@ -82,16 +82,11 @@ public abstract class TestsBase extends OHCoreTestCase {
 	private static TestWard testWard;
 	private static TestSupplier testSupplier;
 
-	protected static GregorianCalendar currentDate;
-	protected static GregorianCalendar pastDate;
-	protected static GregorianCalendar pastDate2;
-	protected static GregorianCalendar futureDate;
-	protected static GregorianCalendar futureDate2;
-
-	protected static Ward internalMedWard;
-	protected static Ward maternityWard;
-	protected static Ward nurseryWard;
-	protected static Ward surgeryWard;
+	protected static GregorianCalendar currentDate = new GregorianCalendar();
+	protected static GregorianCalendar pastDate = new GregorianCalendar();
+	protected static GregorianCalendar pastDate2 = new GregorianCalendar();
+	protected static GregorianCalendar futureDate = new GregorianCalendar();
+	protected static GregorianCalendar futureDate2 = new GregorianCalendar();
 
 	@Autowired
 	MedicalStockIoOperations medicalStockIoOperation;
@@ -136,25 +131,14 @@ public abstract class TestsBase extends OHCoreTestCase {
 		testWard = new TestWard();
 		testSupplier = new TestSupplier();
 
-		// Create test dates
-		currentDate = new GregorianCalendar();
-		pastDate = new GregorianCalendar();
+		// Adjust test dates
 		pastDate.add(GregorianCalendar.SECOND, -1);
-		pastDate2 = new GregorianCalendar();
 		pastDate2.add(GregorianCalendar.SECOND, -2);
-		futureDate = new GregorianCalendar();
 		futureDate.add(GregorianCalendar.SECOND, 1);
-		futureDate2 = new GregorianCalendar();
 		futureDate2.add(GregorianCalendar.SECOND, 2);
-
-		// Create test wards
-		internalMedWard = testWard.setup(TestWardType.INTERNAL_MEDICINE);
-		maternityWard = testWard.setup(TestWardType.MATERNITY);
-		nurseryWard = testWard.setup(TestWardType.NURSERY);
-		surgeryWard = testWard.setup(TestWardType.SURGERY);
 	}
 
-	@BeforeEach
+	@Before
 	public void setUp() throws OHException {
 		cleanH2InMemoryDb();
 	}
@@ -168,10 +152,18 @@ public abstract class TestsBase extends OHCoreTestCase {
 		testMovementType = null;
 		testWard = null;
 		testSupplier = null;
-		internalMedWard = null;
-		maternityWard = null;
-		nurseryWard = null;
-		surgeryWard = null;
+	}
+
+	protected Ward _setupTestWard(TestWardType wardType) throws OHException {
+		Ward ward = testWard.setup(wardType);
+		wardIoOperationRepository.saveAndFlush(ward);
+		return ward;
+	}
+
+	protected Supplier _setupTestSupplier() throws OHException {
+		Supplier supplier = testSupplier.setup();
+		supplierIoOperationRepository.saveAndFlush(supplier);
+		return supplier;
 	}
 
 	protected Medical _setupTestMedical(boolean outOfStock) throws OHException {
@@ -188,17 +180,9 @@ public abstract class TestsBase extends OHCoreTestCase {
 		return lot;
 	}
 
-	// In case quantity is not needed (ie. charging)
-	protected Lot _setupTestLot(Medical medical, GregorianCalendar prepDate, GregorianCalendar dueDate, String lotNo, BigDecimal cost) throws OHException {
-		return _setupTestLot(medical, prepDate, dueDate, lotNo, cost, 0);
-	}
-
-	protected Movement _setupTestMovement(Medical medical, boolean charge, Ward ward, Lot lot, GregorianCalendar date, int quantity, String refNo) throws OHException {
+	protected Movement _setupTestMovement(Medical medical, boolean charge, Ward ward, Supplier supplier, Lot lot, GregorianCalendar date, int quantity, String refNo) throws OHException {
 		MovementType movementType = testMovementType.setup(charge);
-		Supplier supplier = testSupplier.setup();
 		Movement movement = testMovement.setup(medical, movementType, ward, lot, date, quantity, supplier, refNo);
-		supplierIoOperationRepository.saveAndFlush(supplier);
-		wardIoOperationRepository.saveAndFlush(ward);
 		medicalStockMovementTypeIoOperationRepository.saveAndFlush(movementType);
 		return movement;
 	}
