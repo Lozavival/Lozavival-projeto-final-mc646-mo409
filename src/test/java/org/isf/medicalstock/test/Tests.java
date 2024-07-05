@@ -21,8 +21,6 @@
  */
 package org.isf.medicalstock.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -31,9 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.assertj.core.api.Condition;
 import org.isf.OHCoreTestCase;
 import org.isf.generaldata.GeneralData;
 import org.isf.medicals.model.Medical;
@@ -45,9 +42,7 @@ import org.isf.medicalstock.model.Lot;
 import org.isf.medicalstock.model.Movement;
 import org.isf.medicalstock.service.LotIoOperationRepository;
 import org.isf.medicalstock.service.MedicalStockIoOperations;
-import org.isf.medicalstock.service.MedicalStockIoOperations.MovementOrder;
 import org.isf.medicalstock.service.MovementIoOperationRepository;
-import org.isf.medicalstockward.model.MedicalWard;
 import org.isf.medicalstockward.service.MedicalStockWardIoOperationRepository;
 import org.isf.medicalstockward.service.MovementWardIoOperationRepository;
 import org.isf.medstockmovtype.model.MovementType;
@@ -59,7 +54,6 @@ import org.isf.medtype.test.TestMedicalType;
 import org.isf.supplier.model.Supplier;
 import org.isf.supplier.service.SupplierIoOperationRepository;
 import org.isf.supplier.test.TestSupplier;
-import org.isf.utils.exception.OHDataValidationException;
 import org.isf.utils.exception.OHException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.ward.model.Ward;
@@ -67,13 +61,14 @@ import org.isf.ward.service.WardIoOperationRepository;
 import org.isf.ward.test.TestWard;
 import org.isf.ward.test.TestWardType;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +81,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 // @RunWith(Parameterized.class)
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
-public class Tests /*extends OHCoreTestCase*/ {
+public class Tests extends OHCoreTestCase {
 
 	@ClassRule
 	public static final SpringClassRule scr = new SpringClassRule();
@@ -102,14 +97,16 @@ public class Tests /*extends OHCoreTestCase*/ {
 	private static TestWard testWard;
 	private static TestSupplier testSupplier;
 
+	private static GregorianCalendar currentDate;
+	private static GregorianCalendar pastDate;
+	private static GregorianCalendar pastDate2;
+	private static GregorianCalendar futureDate;
+	private static GregorianCalendar futureDate2;
+
 	private static Ward internalMedWard;
 	private static Ward maternityWard;
 	private static Ward nurseryWard;
 	private static Ward surgeryWard;
-
-	private static MedicalType medicalType;
-	private static Medical medInStock;
-	private static Medical medOutOfStock;
 
 	@Autowired
 	MedicalStockIoOperations medicalStockIoOperation;
@@ -138,11 +135,11 @@ public class Tests /*extends OHCoreTestCase*/ {
 	@Autowired
 	ApplicationEventPublisher applicationEventPublisher;
 
-	// public Tests(boolean in, boolean out, boolean toward) {
-	// 	GeneralData.AUTOMATICLOT_IN = in;
-	// 	GeneralData.AUTOMATICLOT_OUT = out;
-	// 	GeneralData.AUTOMATICLOTWARD_TOWARD = toward;
-	// }
+	public Tests() {
+		GeneralData.AUTOMATICLOT_IN = false;
+		GeneralData.AUTOMATICLOT_OUT = false;
+		GeneralData.AUTOMATICLOTWARD_TOWARD = false;
+	}
 
 	@BeforeClass
 	public static void setUpClass() throws OHException {
@@ -154,23 +151,28 @@ public class Tests /*extends OHCoreTestCase*/ {
 		testWard = new TestWard();
 		testSupplier = new TestSupplier();
 
+		// Create test dates
+		currentDate = new GregorianCalendar();
+		pastDate = new GregorianCalendar();
+		pastDate.add(GregorianCalendar.SECOND, -1);
+		pastDate2 = new GregorianCalendar();
+		pastDate2.add(GregorianCalendar.SECOND, -2);
+		futureDate = new GregorianCalendar();
+		futureDate.add(GregorianCalendar.SECOND, 1);
+		futureDate2 = new GregorianCalendar();
+		futureDate2.add(GregorianCalendar.SECOND, 2);
+
 		// Create test wards
 		internalMedWard = testWard.setup(TestWardType.INTERNAL_MEDICINE);
 		maternityWard = testWard.setup(TestWardType.MATERNITY);
 		nurseryWard = testWard.setup(TestWardType.NURSERY);
 		surgeryWard = testWard.setup(TestWardType.SURGERY);
-
-		// Create test medicals
-		medicalType = testMedicalType.setup();
-		medInStock = testMedical.setup(medicalType, false);
-		medOutOfStock = testMedical.setup(medicalType, true);
-
 	}
 
-	// @Before
-	// public void setUp() throws OHException {
-	// 	cleanH2InMemoryDb();
-	// }
+	@BeforeEach
+	public void setUp() throws OHException {
+		cleanH2InMemoryDb();
+	}
 
 	@AfterClass
 	public static void tearDownClass() {
@@ -185,9 +187,6 @@ public class Tests /*extends OHCoreTestCase*/ {
 		maternityWard = null;
 		nurseryWard = null;
 		surgeryWard = null;
-		medicalType = null;
-		medInStock = null;
-		medOutOfStock = null;
 	}
 
 	/*
@@ -233,48 +232,80 @@ public class Tests /*extends OHCoreTestCase*/ {
 	*/
 
 	@Test
-	public void testValidMovement() throws Exception {
-		String lotCode = _setupTestLot(medInStock, new GregorianCalendar(), new GregorianCalendar(), "1", new BigDecimal(0.1));
-		Lot lot = lotIoOperationRepository.findOne(lotCode);
-		Movement movement = _setupTestMovement(medInStock, true, internalMedWard, lot, new GregorianCalendar(), 1, "refNo");
-		// Movement movement = movementIoOperationRepository.findOne(code);
+	public void testValidCharge() throws Exception {
+		// boolean medicalInDb = false;
+		Medical medical = _setupTestMedical(false);
+		Lot lot = _setupTestLot(medical, currentDate, currentDate, "1", new BigDecimal(0.1));
+		Movement movement = _setupTestMovement(medical, true, internalMedWard, lot, currentDate, 1, "refNo");
+		
 		ArrayList<Movement> movements = new ArrayList<>(1);
 		movements.add(movement);
 		assertTrue(movStockInsertingManager.newMultipleChargingMovements(movements, "refNo"));
 	}
 
 	@Test
-	public void testInvalidMovement() throws Exception {
-		String lotCode = _setupTestLot(medInStock, new GregorianCalendar(), new GregorianCalendar(), "1", new BigDecimal(0.1));
-		Lot lot = lotIoOperationRepository.findOne(lotCode);
-		Movement movement = _setupTestMovement(medInStock, true, internalMedWard, lot, new GregorianCalendar(2024, 1, 1), 1, "refNo");
-		// Movement movement = movementIoOperationRepository.findOne(code);
+	public void testInvalidCharge() throws Exception {
+		Medical medical = _setupTestMedical(false);
+		Lot lot = _setupTestLot(medical, currentDate, currentDate, "1", new BigDecimal(0.1));
+		Movement movement = _setupTestMovement(medical, true, internalMedWard, lot, currentDate, 1, "");
+		
 		ArrayList<Movement> movements = new ArrayList<>(1);
 		movements.add(movement);
-		// assertThrows(OHServiceException.class, () -> movStockInsertingManager.newMultipleChargingMovements(movements, null));
-		assertTrue(movStockInsertingManager.newMultipleChargingMovements(movements, "refNo"));
+		assertThrows(OHServiceException.class, () -> movStockInsertingManager.newMultipleChargingMovements(movements, ""));
 	}
 
-	private String _setupTestLot(Medical medical, GregorianCalendar prepDate, GregorianCalendar dueDate, String lotNo, BigDecimal cost) throws OHException {
-		Lot lot = testLot.setup(medical, lotNo, prepDate, dueDate, cost);
+	@Test
+	public void testValidDischarge() throws Exception {
+		// boolean medicalInDb = false;
+		Medical medical = _setupTestMedical(false);
+		Lot lot = _setupTestLot(medical, currentDate, currentDate, "1", new BigDecimal(0.1), 1);
+		Movement movement = _setupTestMovement(medical, false, internalMedWard, lot, currentDate, 1, "refNo");
+		
+		ArrayList<Movement> movements = new ArrayList<>(1);
+		movements.add(movement);
+		assertTrue(movStockInsertingManager.newMultipleDischargingMovements(movements, "refNo"));
+	}
 
+	@Test
+	public void testInvalidDischarge() throws Exception {
+		// boolean medicalInDb = false;
+		Medical medical = _setupTestMedical(false);
+		Lot lot = _setupTestLot(medical, currentDate, currentDate, "1", new BigDecimal(0.1), 1);
+		Movement movement = _setupTestMovement(medical, false, internalMedWard, lot, currentDate, 2, "refNo");
+		
+		ArrayList<Movement> movements = new ArrayList<>(1);
+		movements.add(movement);
+		assertThrows(OHServiceException.class, () ->movStockInsertingManager.newMultipleDischargingMovements(movements, "refNo"));
+	}
+
+	
+
+	private Medical _setupTestMedical(boolean outOfStock) throws OHException {
+		MedicalType medicalType = testMedicalType.setup();
+		Medical medical = testMedical.setup(medicalType, outOfStock);
 		medicalTypeIoOperationRepository.saveAndFlush(medicalType);
 		medicalsIoOperationRepository.saveAndFlush(medical);
+		return medical;
+	}
+
+	private Lot _setupTestLot(Medical medical, GregorianCalendar prepDate, GregorianCalendar dueDate, String lotNo, BigDecimal cost, int quantity) throws OHException {
+		Lot lot = testLot.setup(medical, lotNo, prepDate, dueDate, cost, quantity);
 		lotIoOperationRepository.saveAndFlush(lot);
-		return lot.getCode();
+		return lot;
+	}
+
+	// In case quantity is not needed (ie. charging)
+	private Lot _setupTestLot(Medical medical, GregorianCalendar prepDate, GregorianCalendar dueDate, String lotNo, BigDecimal cost) throws OHException {
+		return _setupTestLot(medical, prepDate, dueDate, lotNo, cost, 0);
 	}
 
 	private Movement _setupTestMovement(Medical medical, boolean charge, Ward ward, Lot lot, GregorianCalendar date, int quantity, String refNo) throws OHException {
 		MovementType movementType = testMovementType.setup(charge);
 		Supplier supplier = testSupplier.setup();
 		Movement movement = testMovement.setup(medical, movementType, ward, lot, date, quantity, supplier, refNo);
-
 		supplierIoOperationRepository.saveAndFlush(supplier);
 		wardIoOperationRepository.saveAndFlush(ward);
 		medicalStockMovementTypeIoOperationRepository.saveAndFlush(movementType);
-		medicalTypeIoOperationRepository.saveAndFlush(medicalType);
-		medicalsIoOperationRepository.saveAndFlush(medical);
-		// movementIoOperationRepository.saveAndFlush(movement);
 		return movement;
 	}
 
