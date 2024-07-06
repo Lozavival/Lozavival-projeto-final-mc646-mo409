@@ -23,8 +23,12 @@ package org.isf.medicalstock.test;
 
 import java.math.BigDecimal;
 import java.util.GregorianCalendar;
+import java.util.List;
 
-import org.isf.OHCoreTestCase;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.graphwalker.core.machine.ExecutionContext;
 import org.isf.generaldata.GeneralData;
 import org.isf.medicals.model.Medical;
 import org.isf.medicals.service.MedicalsIoOperationRepository;
@@ -66,7 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
-public abstract class TestsBase extends OHCoreTestCase {
+public class TestsBase extends ExecutionContext {
 
 	@ClassRule
 	public static final SpringClassRule scr = new SpringClassRule();
@@ -114,6 +118,27 @@ public abstract class TestsBase extends OHCoreTestCase {
 	SupplierIoOperationRepository supplierIoOperationRepository;
 	@Autowired
 	ApplicationEventPublisher applicationEventPublisher;
+
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
+
+	public void cleanH2InMemoryDb() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		entityManager.getTransaction().begin();
+		List<Object[]> show_tables = entityManager.createNativeQuery("SHOW TABLES").getResultList();
+		show_tables
+				.stream()
+				.map(result -> (String) result[0])
+				.forEach(s -> truncateTable(s, entityManager));
+		entityManager.getTransaction().commit();
+		entityManager.close();
+	}
+
+	public void truncateTable(String name, EntityManager entityManager) {
+		entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
+		entityManager.createNativeQuery("TRUNCATE TABLE " + name).executeUpdate();
+		entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
+	}
 
 	public TestsBase() {
 		GeneralData.AUTOMATICLOT_IN = false;

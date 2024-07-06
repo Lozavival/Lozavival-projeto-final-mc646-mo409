@@ -105,7 +105,7 @@ public class InterfaceTests extends TestsBase {
     *      - (boolean) valid test case
     */
     @Parameters
-    public static Collection<Object[]> data() {
+    public static Collection<Object[]> testParameters() {
         return Arrays.asList(new Object[][] {
             // charge tests
             /* TC1 */{false, true, true, currentDate, currentDate, "a", new BigDecimal(0.1), 0, true, true, true, null, false, true, pastDate, pastDate, 1, "r", true},
