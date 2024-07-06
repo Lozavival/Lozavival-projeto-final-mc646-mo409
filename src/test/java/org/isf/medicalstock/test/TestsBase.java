@@ -70,7 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
-public class TestsBase extends ExecutionContext {
+public abstract class TestsBase extends ExecutionContext {
 
 	@ClassRule
 	public static final SpringClassRule scr = new SpringClassRule();
