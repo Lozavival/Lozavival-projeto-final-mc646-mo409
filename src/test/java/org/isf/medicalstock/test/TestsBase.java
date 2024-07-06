@@ -144,6 +144,7 @@ public abstract class TestsBase extends ExecutionContext {
 		GeneralData.AUTOMATICLOT_IN = false;
 		GeneralData.AUTOMATICLOT_OUT = false;
 		GeneralData.AUTOMATICLOTWARD_TOWARD = false;
+		GeneralData.LOTWITHCOST = true;
 	}
 
 	@BeforeClass

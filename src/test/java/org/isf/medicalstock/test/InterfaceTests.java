@@ -194,7 +194,6 @@ public class InterfaceTests extends TestsBase {
 
         if (useMedical && !medicalInDb) {
             medicalsIoOperationRepository.delete(medical.getCode());
-            medicalsIoOperationRepository.flush();
         }
 
         if (movementType) { // charging
