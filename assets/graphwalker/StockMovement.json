@@ -1,0 +1,206 @@
+{
+    "models": [
+        {
+            "edges": [
+                {
+                    "id": "aa03a9ed-ca08-4a40-b0ae-fbeeb4c0632c",
+                    "name": "e_dischargeInvalid",
+                    "sourceVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "targetVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "actions": [
+                        "Aviso = 1;"
+                    ]
+                },
+                {
+                    "id": "6257d286-3620-481c-90b9-1d45c6c12ec2",
+                    "name": "e_chargeInvalid",
+                    "sourceVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "targetVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "actions": [
+                        "Erro  = 1;"
+                    ]
+                },
+                {
+                    "id": "ec1fd85d-08b5-4289-8aa0-5f6af83a0098",
+                    "name": "e_chargeInvalid",
+                    "sourceVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "targetVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "actions": [
+                        "Erro = 1;"
+                    ]
+                },
+                {
+                    "id": "f5a3dde3-3948-4329-b971-35b82190055b",
+                    "name": "e_charge",
+                    "sourceVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "targetVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "actions": [
+                        "stock += qtd;"
+                    ],
+                    "guard": "stock + qtd <= crit_level"
+                },
+                {
+                    "id": "00dc2975-f454-4848-8e92-078e22a0292d",
+                    "name": "e_dischargeInvalid",
+                    "sourceVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "targetVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "actions": [
+                        "Aviso = 1;"
+                    ]
+                },
+                {
+                    "id": "a1fb0bfd-069a-49b0-9044-abf1bbd194b9",
+                    "name": "e_dischargeInvalid",
+                    "sourceVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "targetVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "actions": [
+                        "Aviso = 1;"
+                    ]
+                },
+                {
+                    "id": "efa672b2-381e-4dc0-81b0-cf1c05c418d3",
+                    "name": "e_discharge",
+                    "sourceVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "targetVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "actions": [
+                        "stock -= qtd;"
+                    ],
+                    "guard": "stock - qtd > crit_level"
+                },
+                {
+                    "id": "34bafb36-1de2-4ade-a752-3e285e9973a6",
+                    "name": "e_charge",
+                    "sourceVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "targetVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "actions": [
+                        "stock += qtd;"
+                    ]
+                },
+                {
+                    "id": "71f842c3-671d-40a9-90cc-2a7e152cc4e4",
+                    "name": "e_chargeToAbove",
+                    "sourceVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "targetVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "actions": [
+                        "stock = 9;"
+                    ]
+                },
+                {
+                    "id": "49adf608-e9d4-4245-9901-0d4d527fdc6c",
+                    "name": "e_dischargeToEmpty",
+                    "sourceVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "targetVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "actions": [
+                        "stock = 0;"
+                    ]
+                },
+                {
+                    "id": "7bbccecc-e69b-4e37-bd4b-686efdd5fb45",
+                    "name": "e_discharge",
+                    "sourceVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "targetVertexId": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "actions": [
+                        "stock -= qtd;"
+                    ],
+                    "guard": "stock - qtd == 0"
+                },
+                {
+                    "id": "b2044d30-d351-4667-8280-76a398594465",
+                    "name": "e_discharge",
+                    "sourceVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "targetVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "actions": [
+                        "stock -= qtd;"
+                    ],
+                    "guard": "stock - qtd <= crit_level"
+                },
+                {
+                    "id": "8a731f9b-5e59-4422-8c35-539aaad8bb35",
+                    "name": "e_charge",
+                    "sourceVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "targetVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "actions": [
+                        "stock += qtd;"
+                    ],
+                    "guard": "stock + qtd > crit_level"
+                },
+                {
+                    "id": "6adde198-1251-4939-8751-a71105c15faa",
+                    "name": "e_discharge",
+                    "sourceVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "targetVertexId": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "actions": [
+                        "stock -= qtd;"
+                    ],
+                    "guard": "stock - qtd > 0"
+                },
+                {
+                    "id": "4406a30c-cb72-417c-ade5-7d1149308eaf",
+                    "name": "e_charge",
+                    "sourceVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "targetVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "actions": [
+                        "stock += qtd;"
+                    ]
+                },
+                {
+                    "id": "70795c48-18a9-4f69-9b53-1d8a567499ef",
+                    "name": "e_chargeInvalid",
+                    "sourceVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "targetVertexId": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "actions": [
+                        "Erro = 1;"
+                    ]
+                }
+            ],
+            "generator": "random(edge_coverage(100))",
+            "id": "8d6ee663-5798-4806-8262-c4180605c7e3",
+            "name": "StockMovement",
+            "startElementId": "bcb89f44-546e-4668-8439-fc9000c33972",
+            "vertices": [
+                {
+                    "id": "bcb89f44-546e-4668-8439-fc9000c33972",
+                    "name": "v_OutOfStock",
+                    "properties": {
+                        "x": 195.60855080510828,
+                        "y": 171.09494725152692
+                    },
+                    "requirements": [
+                        "stock == 0"
+                    ]
+                },
+                {
+                    "id": "c6cc89cf-0057-4f50-a9bc-8babebc9ac76",
+                    "name": "v_AboveCriticalLevel",
+                    "properties": {
+                        "x": 363.70183231538033,
+                        "y": 442.2454192115491
+                    },
+                    "requirements": [
+                        "stock > crit_level"
+                    ]
+                },
+                {
+                    "id": "fcff80a7-cdf7-4f28-a052-4b00521d700e",
+                    "name": "v_BellowCriticalLevel",
+                    "properties": {
+                        "x": 634.8523042754025,
+                        "y": 219.12159911160467
+                    },
+                    "requirements": [
+                        "0 < stock <= crit_level"
+                    ]
+                }
+            ],
+            "actions": [
+                "stock = 0;",
+                "qtd = 3;",
+                "crit_level = 7;",
+                "Aviso = 0;",
+                "Erro = 0;"
+            ]
+        }
+    ],
+    "selectedModelIndex": 0,
+    "selectedElementId": "bcb89f44-546e-4668-8439-fc9000c33972"
+}
